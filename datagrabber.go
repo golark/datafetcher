@@ -1,11 +1,18 @@
 package main
 
+//go:generate protoc datagrabber.proto -I=./dgproto --go_out=plugins=grpc:./dgproto
+
 import (
+	"github.com/golark/datagrabber/cmd"
 	"github.com/golark/datagrabber/explorer"
+	"github.com/golark/datagrabber/extractor"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+
+	cmd.ServeGrpc()
+
 
 	url:= "https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases"
 	linkTraces := explorer.FindLinksOnPage(url)
@@ -13,9 +20,35 @@ func main() {
 	filtTraces := explorer.FilterLinkTraces(linkTraces, []string{".csv"})
 	filtTraces  = explorer.FilterLinkTraces(filtTraces, []string{"covid", "corona"})
 
-	for _, trace := range filtTraces {
-		log.WithFields(log.Fields{"trace Text:":trace.Text}).Info("")
-		log.WithFields(log.Fields{"trace URL:":trace.Url}).Info("")
+	if filtTraces == nil {
+		log.Info("no link matching criteria was found")
+		return
 	}
 
+	// log potential links
+	log.WithFields(log.Fields{"num Hits": len(filtTraces)}).Info("number of hits")
+
+	for _, trace := range filtTraces {
+		log.WithFields(log.Fields{"trace Text:":trace.DataIdentifier}).Trace("")
+		log.WithFields(log.Fields{"trace URL:":trace.Url}).Trace("")
+	}
+
+	//
+	explorer.PruneDataIdentifier(filtTraces, "covid")
+
+	for _, trace := range filtTraces {
+		log.WithFields(log.Fields{"name: ":trace.PrunedDataIdentifier}).Info("potential match")
+	}
+
+	// download link
+	contents, err := extractor.DownloadLink("https://data.humdata.org/" + filtTraces[0].Url)
+	if err!= nil {
+		log.WithFields(log.Fields{"err":err}).Error("cant download link")
+	}
+
+	rowHeaders, colHeaders := extractor.GetHeaders(contents)
+	log.WithFields(log.Fields{"rowHeaders":rowHeaders}).Info("")
+	log.WithFields(log.Fields{"colHeaders":colHeaders}).Info("")
+
 }
+

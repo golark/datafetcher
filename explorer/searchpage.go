@@ -3,14 +3,16 @@ package explorer
 import (
 	"github.com/gocolly/colly"
 	log "github.com/sirupsen/logrus"
+	"regexp"
 	"strings"
 )
 
 // LinkTrace
 // text/url tuple that are extracted from pages
 type LinkTrace struct{
-	Text string
+	DataIdentifier string
 	Url string
+	PrunedDataIdentifier string
 }
 
 // FindLinksOnPage
@@ -24,7 +26,7 @@ func FindLinksOnPage(url string) []LinkTrace {
 
 	// step 2 - append results to collection during search
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		linkTraces = append(linkTraces, LinkTrace{e.Text, e.Attr("href")})
+		linkTraces = append(linkTraces, LinkTrace{e.Text, e.Attr("href"), ""})
 	})
 
 	// step 3 - before making a request print "Visiting ..."
@@ -63,7 +65,7 @@ func FilterLinkTraces(linkTraces []LinkTrace, filters []string) []LinkTrace {
 	for _, trace := range linkTraces {
 
 		// match case to the filter
-		text := strings.ToLower(trace.Text)
+		text := strings.ToLower(trace.DataIdentifier)
 		url  := strings.ToLower(trace.Url)
 
 		for _, filter := range lcFilter {
@@ -72,9 +74,23 @@ func FilterLinkTraces(linkTraces []LinkTrace, filters []string) []LinkTrace {
 				break
 			}
 		}
-
 	}
 
 	return filteredTraces
 }
 
+// PruneDataIdentifier
+// search through link trace text to match following rule and populate PrunedDataIdentifier of the trace
+// any non space character, followed by dataIdentifier, followed by any of the extensions
+// case insensitive
+func PruneDataIdentifier(linkTraces []LinkTrace, dataIdentifier string) {
+
+	// any non space character, followed by dataIdentifier, followed by any of the extensions
+	re := regexp.MustCompile(`\S*` + strings.ToLower(dataIdentifier) + `.*(.csv|.doc|csv|.json)`)
+
+	for i, trace := range linkTraces {
+		text := strings.ToLower(trace.DataIdentifier)
+		linkTraces[i].PrunedDataIdentifier = re.FindString(text)
+	}
+
+}

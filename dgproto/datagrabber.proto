@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package dgproto;
+
+service DataService {
+
+  rpc DataInquiry(SearchReq) returns (stream DataHeaderResp);
+
+}
+
+message SearchReq {
+  string Identifier = 1;
+}
+
+message DataHeaderResp {
+  string ColHeader = 1;
+  string RowHeader = 2;
+}
