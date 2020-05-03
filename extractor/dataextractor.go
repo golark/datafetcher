@@ -23,9 +23,9 @@ func ReadFileContents(r io.ReadCloser) ([][]string, error ){
 	return contents, nil
 }
 
-// GetHeaders
+// extractHeaders
 // return headers ( first column and first row )
-func GetHeaders(data [][]string) (rowHeaders, colHeaders []string){
+func extractHeaders(data [][]string) (rowHeaders, colHeaders []string){
 
 	rowHeaders = data[0]
 
@@ -38,3 +38,17 @@ func GetHeaders(data [][]string) (rowHeaders, colHeaders []string){
 	return rowHeaders, colHeaders
 
 }
+
+func GetDataHeadersFromUrl(url string) (rowHeaders, colHeaders []string){
+
+	linkContents, err := DownloadLink(url)
+	if err!= nil {
+		log.WithFields(log.Fields{"err":err}).Error("cant download link")
+		return nil, nil
+	}
+
+	rowHeaders, colHeaders = extractHeaders(linkContents)
+
+	return rowHeaders, colHeaders
+}
+

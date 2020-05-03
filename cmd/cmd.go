@@ -2,47 +2,49 @@ package cmd
 
 import (
 	"github.com/golark/datagrabber/dgproto"
+	"github.com/golark/datagrabber/symphoniser"
 	log "github.com/sirupsen/logrus"
 	gRPC "google.golang.org/grpc"
 	"net"
-	"strconv"
 )
 
 const (
 	GrpcPort = ":8090"
 )
 
-type DataReq struct {
-
-}
+type DataReq struct {}
 
 func (d DataReq) DataInquiry(req *dgproto.SearchReq, stream dgproto.DataService_DataInquiryServer) error {
 
-	log.WithFields(log.Fields{"req:":req.String()}).Info("DataInquiry")
+	log.WithFields(log.Fields{"reqquest identifier":req.Identifier}).Info("new data inquiry")
 
-	for i:=0;i<10;i++ {
-		resp := dgproto.DataHeaderResp{ColHeader:strconv.Itoa(i), RowHeader:strconv.Itoa(i+10)}
-		stream.Send(&resp)
+	// step 1 - request data inquiry
+	rowHeaders, colHeaders := symphoniser.GetDataHeaders("covid") // @TODO add request identifier
+
+	// step 2 - send the stream
+	for _, row := range rowHeaders {
+		for _, col := range colHeaders {
+			resp := dgproto.DataHeaderResp{ColHeader: col, RowHeader: row}
+			stream.Send(&resp)
+		}
 	}
 
 	return nil
 }
 
-
 func ServeGrpc() {
 
 	l, err := net.Listen("tcp", GrpcPort)
-
 	if err!=nil {
 		log.WithFields(log.Fields{"err":err}).Error("cant listen")
 		return
 	}
 
 	s := gRPC.NewServer()
-
 	dgproto.RegisterDataServiceServer(s, DataReq{})
 	if err = s.Serve(l); err != nil {
 		log.WithFields(log.Fields{"err":err}).Error("error serving")
 	}
 
 }
+

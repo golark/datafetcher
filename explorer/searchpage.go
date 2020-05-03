@@ -12,8 +12,20 @@ import (
 type LinkTrace struct{
 	DataIdentifier string
 	Url string
+	RootUrl string
 	PrunedDataIdentifier string
 }
+
+func SearchLinkTraces(url string, identifiers []string, fileExt string) []LinkTrace {
+
+	linkTraces := FindLinksOnPage(url)
+
+	filtTraces := FilterLinkTraces(linkTraces, []string{fileExt})
+	filtTraces  = FilterLinkTraces(filtTraces, identifiers)
+
+	return filtTraces
+}
+
 
 // FindLinksOnPage
 // find all the links on the page
@@ -26,7 +38,7 @@ func FindLinksOnPage(url string) []LinkTrace {
 
 	// step 2 - append results to collection during search
 	c.OnHTML("a[href]", func(e *colly.HTMLElement) {
-		linkTraces = append(linkTraces, LinkTrace{e.Text, e.Attr("href"), ""})
+		linkTraces = append(linkTraces, LinkTrace{e.Text, e.Attr("href"), url, ""})
 	})
 
 	// step 3 - before making a request print "Visiting ..."

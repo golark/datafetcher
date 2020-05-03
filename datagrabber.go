@@ -9,10 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func main() {
-
-	cmd.ServeGrpc()
-
+func exampleDataFetch() {
 
 	url:= "https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases"
 	linkTraces := explorer.FindLinksOnPage(url)
@@ -41,14 +38,13 @@ func main() {
 	}
 
 	// download link
-	contents, err := extractor.DownloadLink("https://data.humdata.org/" + filtTraces[0].Url)
-	if err!= nil {
-		log.WithFields(log.Fields{"err":err}).Error("cant download link")
-	}
-
-	rowHeaders, colHeaders := extractor.GetHeaders(contents)
+	rowHeaders, colHeaders := extractor.GetDataHeadersFromUrl("https://data.humdata.org/" + filtTraces[0].Url)
 	log.WithFields(log.Fields{"rowHeaders":rowHeaders}).Info("")
 	log.WithFields(log.Fields{"colHeaders":colHeaders}).Info("")
 
+}
+
+func main() {
+	cmd.ServeGrpc()
 }
 
