@@ -5,6 +5,34 @@ import (
 	"testing"
 )
 
+
+func TestIsLetters(t *testing.T) {
+
+	// test 1
+	testString := "88"
+	exp := false
+	res := isLetters(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 2
+	testString = "acbvAdaufsa.fa:"
+	exp = true
+	res = isLetters(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 3
+	testString = "acbvAdaufsa.....? fa:"
+	exp = true
+	res = isLetters(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+}
+
 func TestIsNumerical(t *testing.T) {
 
 	// test 1

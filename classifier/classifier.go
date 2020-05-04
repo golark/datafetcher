@@ -11,6 +11,24 @@ var Classes = map[string][]*unicode.RangeTable {
 	"letters"  : {unicode.Lu, unicode.Ll, unicode.L, unicode.Z, unicode.P},
 }
 
+// isLetters
+// returns true if the data only consists of letters and punctuation
+func isLetters(s string) bool {
+
+	if s == "" { // check empty string
+		return false
+	}
+
+	for _, r := range s {
+		if !unicode.IsLetter(r) && !unicode.IsPunct(r) && !unicode.IsSpace(r) {
+			return false
+		}
+	}
+
+	return true
+}
+
+
 // isDate
 func isDate(s string) bool {
 
