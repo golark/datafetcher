@@ -2,14 +2,29 @@ package classifier
 
 import "unicode"
 
-var Classes = map[string][]*unicode.RangeTable {
-	// "date"     : {unicode.N},
-	"integer"  : {unicode.N},
-	// "floating" : {unicode.N, },
-	"time"     : {unicode.N},
-	"currency" : {unicode.N, unicode.Sc},
-	"letters"  : {unicode.Lu, unicode.Ll, unicode.L, unicode.Z, unicode.P},
+
+// classifierFunc
+// determines if the string belongs to a given class
+type classifierFunc func(string) bool
+
+const (
+	NoClass     = iota
+	DateClass   = iota
+	NumberClass = iota
+	TimeClass   = iota
+	LetterClass = iota
+)
+
+
+// Classes
+// classes and the classification functions that determine whether given string belongs to one of the below classes
+var Classes = map[int]classifierFunc {
+	DateClass : isDate,
+	NumberClass : isNumerical,
+	TimeClass : isTime,
+	LetterClass : isLetters,
 }
+
 // isTime
 // returns true if only numeric and ':' runes constitute input string
 // there must be at least one divider (  ':' )
@@ -88,7 +103,7 @@ func isDate(s string) bool {
 		}
 	}
 
-	if numDividers == 0 || numDividers > 2 {
+	if numDividers == 0 || numDividers > 2 || consecutiveNums > 4{
 		return false
 	} else {
 		return true
@@ -131,9 +146,16 @@ func getRuneCategories(s string) []string {
 }
 
 // Classify
-// classify data as one of the following:
-//
-func Classify(identifier string) (string, int){
-	return "", 0
+// try to classify input string to one of the "Classes"
+func Classify(s string) (int){
+
+	for class, classFunc := range Classes {
+		if classFunc(s) {
+			return class
+		}
+	}
+
+	return NoClass // can't classify
+
 }
 

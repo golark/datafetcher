@@ -5,7 +5,57 @@ import (
 	"testing"
 )
 
-func TestIsData(t *testing.T) {
+func TestClassify(t *testing.T) {
+
+	// test 1
+	testString := "15:30"
+	exp := TimeClass
+	res := Classify(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 2
+	testString = "aveebeesfs"
+	exp = LetterClass
+	res = Classify(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 3
+	testString = "2/3/2015"
+	exp = DateClas	// test 4
+	testString = "avvsa?132135wf..."
+	exp = NoClass
+	res = Classify(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}s
+	res = Classify(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 4
+	testString = "avvsa?132135wf..."
+	exp = NoClass
+	res = Classify(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 5
+	testString = "2.1.232015"
+	exp = NumberClass
+	res = Classify(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+}
+
+func TestIsTime(t *testing.T) {
 
 	// test 1
 	testString := "15:30"
@@ -18,7 +68,7 @@ func TestIsData(t *testing.T) {
 	// test 2
 	testString = "1649"
 	exp = false
-	res = isDate(testString)
+	res = isTime(testString)
 	if res != exp {
 		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
 	}
@@ -26,7 +76,7 @@ func TestIsData(t *testing.T) {
 	// test 3
 	testString = "abcv"
 	exp = false
-	res = isDate(testString)
+	res = isTime(testString)
 	if res != exp {
 		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
 	}
