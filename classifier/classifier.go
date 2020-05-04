@@ -2,15 +2,65 @@ package classifier
 
 import "unicode"
 
+var Classes = map[string][]*unicode.RangeTable {
+	// "date"     : {unicode.N},
+	"integer"  : {unicode.N},
+	// "floating" : {unicode.N, },
+	"time"     : {unicode.N},
+	"currency" : {unicode.N, unicode.Sc},
+	"letters"  : {unicode.Lu, unicode.Ll, unicode.L, unicode.Z, unicode.P},
+}
+
+// isDate
+func isDate(s string) bool {
+
+	// step 1 -  check minimum rune requirement for a date
+	if len(s) < 4 {
+		return false
+	}
+
+	// step 2 -
+	// - there must be at least one instance of a '.' or '/' but less than 2 dividers
+	// - others must be a numerical digit, and no more than 4 consecutive numbers
+	numDividers := 0
+	consecutiveNums := 0
+	for _, r := range s {
+
+		if unicode.IsNumber(r) {
+			consecutiveNums++
+			if consecutiveNums > 4 { // no more than 4 consecutive numbers allowed
+				return false
+			}
+		} else if r == '/' || r == '.' {
+			numDividers++
+			consecutiveNums = 0
+		} else if !unicode.IsSpace(r) {
+			return false // if not space or number or '/' or '.' this cant be a date
+		}
+	}
+
+	if numDividers == 0 || numDividers > 2 {
+		return false
+	} else {
+		return true
+	}
+
+}
+
 // isNumerical
 // returns true if the data only consists of numbers and dots
 func isNumerical(s string) bool {
 
+	if s == "" { // check empty string
+		return false
+	}
+
 	for _, r := range s {
-		if !unicode.IsNumber(r) {
+		if !unicode.IsNumber(r) && r != '.' {
 			return false
 		}
 	}
+
 	return true
 }
 
@@ -37,3 +87,4 @@ func getRuneCategories(s string) []string {
 func Classify(identifier string) (string, int){
 	return "", 0
 }
+
