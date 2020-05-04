@@ -5,6 +5,32 @@ import (
 	"testing"
 )
 
+func TestIsData(t *testing.T) {
+
+	// test 1
+	testString := "15:30"
+	exp := true
+	res := isTime(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 2
+	testString = "1649"
+	exp = false
+	res = isDate(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+
+	// test 3
+	testString = "abcv"
+	exp = false
+	res = isDate(testString)
+	if res != exp {
+		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
+	}
+}
 
 func TestIsLetters(t *testing.T) {
 

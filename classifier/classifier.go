@@ -10,9 +10,40 @@ var Classes = map[string][]*unicode.RangeTable {
 	"currency" : {unicode.N, unicode.Sc},
 	"letters"  : {unicode.Lu, unicode.Ll, unicode.L, unicode.Z, unicode.P},
 }
+// isTime
+// returns true if only numeric and ':' runes constitute input string
+// there must be at least one divider (  ':' )
+func isTime(s string) bool {
+
+	if len(s) < 4 { // check have time with 4 or less runes
+		return false
+	}
+
+	consecutiveNums := 0
+	dividerCount := 0
+	for _, r := range s {
+		if unicode.IsNumber(r) {
+			consecutiveNums++
+			if consecutiveNums > 3 { // cant have more than 3 consecutive numbers in time unless some atomic time
+				return false
+			}
+		} else if r == ':' {
+			consecutiveNums = 0
+			dividerCount++
+		} else if !unicode.IsSpace(r) {
+			return false
+		}
+	}
+
+	if dividerCount < 1 { // there must be at least one divider in time
+		return false
+	}
+
+	return true
+}
 
 // isLetters
-// returns true if the data only consists of letters and punctuation
+// returns true if the data only consists of letters, space and punctuatio ( no numeric digits are allowed )
 func isLetters(s string) bool {
 
 	if s == "" { // check empty string
