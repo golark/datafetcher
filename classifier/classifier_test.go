@@ -25,13 +25,13 @@ func TestClassify(t *testing.T) {
 
 	// test 3
 	testString = "2/3/2015"
-	exp = DateClas	// test 4
+	exp = DateClass	// test 4
 	testString = "avvsa?132135wf..."
 	exp = NoClass
 	res = Classify(testString)
 	if res != exp {
 		t.Errorf("expected %v got %v for testString %v", exp, res, testString)
-	}s
+	}
 	res = Classify(testString)
 	if res != exp {
 		t.Errorf("expected %v got %v for testString %v", exp, res, testString)

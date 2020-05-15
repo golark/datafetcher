@@ -39,6 +39,8 @@ func extractHeaders(data [][]string) (rowHeaders, colHeaders []string){
 
 }
 
+// GetDataHeadersFromUrl
+// downloads the url and gets data headers
 func GetDataHeadersFromUrl(url string) (rowHeaders, colHeaders []string){
 
 	linkContents, err := DownloadLink(url)
