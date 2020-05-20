@@ -41,7 +41,6 @@ func exampleSingleShotGrpcClient(addr string) error {
 
 }
 
-
 // example client for grpc interface
 func main() {
 	exampleSingleShotGrpcClient("localhost:8090")
