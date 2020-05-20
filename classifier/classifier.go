@@ -2,7 +2,6 @@ package classifier
 
 import "unicode"
 
-
 // classifierFunc
 // determines if the string belongs to a given class
 type classifierFunc func(string) bool
@@ -14,7 +13,6 @@ const (
 	TimeClass   = iota
 	LetterClass = iota
 )
-
 
 // Classes
 // classes and the classification functions that determine whether given string belongs to one of the below classes
