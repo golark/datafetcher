@@ -16,7 +16,7 @@ type DataReq struct {}
 
 func (d DataReq) DataInquiry(req *dgproto.SearchReq, stream dgproto.DataService_DataInquiryServer) error {
 
-	log.WithFields(log.Fields{"reqquest identifier":req.Identifier}).Info("new data inquiry")
+	log.WithFields(log.Fields{"request identifier":req.Identifier}).Info("new data inquiry")
 
 	// step 1 - request data inquiry
 	rowHeaders, colHeaders := symphoniser.GetDataHeaders("covid") // @TODO add request identifier
