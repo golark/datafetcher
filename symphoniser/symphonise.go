@@ -24,6 +24,5 @@ func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 	log.WithFields(log.Fields{"colHeaders":colHeaders}).Info("")
 
 	return rowHeaders, colHeaders
-
 }
 

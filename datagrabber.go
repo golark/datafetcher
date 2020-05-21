@@ -3,6 +3,7 @@ package main
 //go:generate protoc datagrabber.proto -I=./dgproto --go_out=plugins=grpc:./dgproto
 
 import (
+	"context"
 	"github.com/golark/datagrabber/cmd"
 	"github.com/golark/datagrabber/dgproto"
 	"github.com/golark/datagrabber/explorer"
@@ -26,8 +27,7 @@ func exampleSingleShotGrpcClient(addr string) error {
 
 	client := dgproto.NewDataServiceClient(conn)
 
-	r, err := client.DataInquiry(con
-	text.Background(), &dgproto.SearchReq{Identifier:""})
+	r, err := client.DataInquiry(context.Background(), &dgproto.SearchReq{Identifier:""})
 	if err != nil {
 		log.WithFields(log.Fields{"err":err}).Error("cant get data inquiry client")
 		return err
