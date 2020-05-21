@@ -4,7 +4,7 @@ package main
 
 import (
 	"context"
-	"github.com/golark/datagrabber/cmd"
+	"github.com/golark/datagrabber/db"
 	"github.com/golark/datagrabber/dgproto"
 	"github.com/golark/datagrabber/explorer"
 	"github.com/golark/datagrabber/extractor"
@@ -80,7 +80,32 @@ func exampleDataFetch() {
 
 }
 
+
+func exampledb() {
+
+	URI := "mongodb://localhost:27017"
+	client, err := db.Connect(URI)
+	if err != nil {
+		log.WithFields(log.Fields{"err":err}).Error("")
+	}
+	defer db.Disconnect(client)
+
+
+	database := "testdbt"
+	collectionURI := "testcollection"
+
+	collection, err := db.AddCollection(client, database, collectionURI)
+	if err != nil {
+		log.WithFields(log.Fields{"err":err}).Error("")
+	}
+
+	db.InsertSingleDataPoint(collection, db.DataPoint{Col:"col", Row:"row", Val:"val"})
+	if err != nil {
+	}
+}
+
 func main() {
-	cmd.ServeGrpc()
+	exampledb()
+	// cmd.ServeGrpc()
 }
 

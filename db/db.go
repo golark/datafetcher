@@ -96,7 +96,21 @@ func AddCollection(client *mongo.Client, database string, collection string) (*m
 	}
 
 	// step 2 - add database and collection
-	return client.Database(database).Collection("entries"), nil
+	return client.Database(database).Collection(collection), nil
+}
+
+// RemoveCollection
+func RemoveCollection(client *mongo.Client,  database string, collection string) error {
+
+	// step 1 - check client connection
+	if err := IsConnected(client); err != nil {
+		return err
+	}
+
+	// step 2 - remove collection
+	err := client.Database(database).Collection(collection).Drop(context.TODO())
+
+	return err
 }
 
 // DataPoint
@@ -116,7 +130,7 @@ func InsertSingleDataPoint(collection *mongo.Collection, dp DataPoint) error {
 	}
 
 	// step 2 - insert single data point
-	res, err := collection.InsertOne(context.TODO(), dp, nil)
+	res, err := collection.InsertOne(context.TODO(), dp)
 	if err != nil {
 		return err
 	}
@@ -138,8 +152,9 @@ func GetSingleDataPoint(collection *mongo.Collection, row string, col string) (D
 	}
 
 	// step 2 - find one and decode into a datapoint
-	filter := bson.D{{"Row", row }, {"Col", col}}
-	err := collection.FindOne(context.TODO(), filter, nil).Decode(&dp)
+	filter := bson.D{{"row", row }, {"col", col}}
+	err := collection.FindOne(context.TODO(), filter).Decode(&dp)
 
 	return dp, err
 }
+
