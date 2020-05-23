@@ -17,6 +17,106 @@ var (
 	ErrCollectioniIsNil       = errors.New("collection is nil")
 )
 
+type Line struct {
+	Identifier string
+	X []string
+	Y []string
+}
+
+// InsertSingleDataPoint
+func InsertSingleLine(collection *mongo.Collection, l Line) error {
+
+	// step 1 - insert single line
+	res, err := collection.InsertOne(context.TODO(), l)
+	if err != nil {
+		return err
+	}
+
+	log.WithFields(log.Fields{"insertedId":res.InsertedID}).Trace("inserted item")
+
+	return nil
+}
+
+// GetSingleLine
+// search for single line and return match
+func GetSingleLine(collection *mongo.Collection, identifier string) (Line, error) {
+
+	var l Line
+	// step 1 - check collection
+	if collection == nil {
+		return l, ErrCollectioniIsNil
+	}
+
+	// step 2 - find one and decode into a datapoint
+	filter := bson.D{{"identifier", identifier }}
+	err := collection.FindOne(context.TODO(), filter).Decode(&l)
+
+	return l, err
+}
+
+// DataPoint
+// a single entry of data with row/col headers
+type DataPoint struct {
+	Row string
+	Col string
+	Val string
+}
+
+// InsertSingleDataPoint
+func InsertSingleDataPoint(collection *mongo.Collection, dp DataPoint) error {
+
+	// step 1 - insert single data point
+	res, err := collection.InsertOne(context.TODO(), dp)
+	if err != nil {
+		return err
+	}
+
+	log.WithFields(log.Fields{"insertedId":res.InsertedID}).Trace("inserted item")
+
+	return nil
+}
+
+// GetSingleDataPoint
+// search collection for single match with row/col parameters and decode into a datapoint
+func GetSingleDataPoint(collection *mongo.Collection, row string, col string) (DataPoint, error) {
+
+	var dp DataPoint
+
+	// step 1 - check collection
+	if collection == nil {
+		return dp, ErrCollectioniIsNil
+	}
+
+	// step 2 - find one and decode into a datapoint
+	filter := bson.D{{"row", row }, {"col", col}}
+	err := collection.FindOne(context.TODO(), filter).Decode(&dp)
+
+	return dp, err
+}
+
+// InsertTable
+// insert double dimensional slice of datapoints
+func InsertTable(collection *mongo.Collection, table [][]DataPoint) {
+
+	for _,i := range table {
+		InsertDataPointLine(collection, i)
+	}
+
+}
+
+// InsertLine
+// insert slice of data points
+func InsertDataPointLine(collection *mongo.Collection, line []DataPoint) error {
+	for _,i := range line {
+		err := InsertSingleDataPoint(collection, i)
+		if err!= nil {
+			return err
+		}
+	}
+	return nil
+}
+
+
 // IsConnected
 // returns nil if can ping db
 func IsConnected(client *mongo.Client) error {
@@ -111,50 +211,5 @@ func RemoveCollection(client *mongo.Client,  database string, collection string)
 	err := client.Database(database).Collection(collection).Drop(context.TODO())
 
 	return err
-}
-
-// DataPoint
-// a single entry of data with row/col headers
-type DataPoint struct {
-	Row string
-	Col string
-	Val string
-}
-
-// InsertSingleDataPoint
-func InsertSingleDataPoint(collection *mongo.Collection, dp DataPoint) error {
-
-	// step 1 - check collection
-	if collection == nil {
-		return ErrCollectioniIsNil
-	}
-
-	// step 2 - insert single data point
-	res, err := collection.InsertOne(context.TODO(), dp)
-	if err != nil {
-		return err
-	}
-
-	log.WithFields(log.Fields{"insertedId":res.InsertedID}).Trace("inserted item")
-
-	return nil
-}
-
-// GetSingleDataPoint
-// search collection for single match with row/col parameters and decode into a datapoint
-func GetSingleDataPoint(collection *mongo.Collection, row string, col string) (DataPoint, error) {
-
-	var dp DataPoint
-
-	// step 1 - check collection
-	if collection == nil {
-		return dp, ErrCollectioniIsNil
-	}
-
-	// step 2 - find one and decode into a datapoint
-	filter := bson.D{{"row", row }, {"col", col}}
-	err := collection.FindOne(context.TODO(), filter).Decode(&dp)
-
-	return dp, err
 }
 
