@@ -34,7 +34,7 @@ func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 	return rowHeaders, colHeaders
 }
 
-func ImportTableToDb(data [][]string, rowHead []string, colHead []string, identifier string) error {
+func ImportTableTodB(data [][]string, rowHead []string, colHead []string, identifier string) error {
 
 	// step 1 - connect to db
 	client, err := db.Connect(URIdB)
@@ -43,7 +43,7 @@ func ImportTableToDb(data [][]string, rowHead []string, colHead []string, identi
 	}
 
 	// step 2 - add collection
-	collection, err := db.AddCollection(client, DATABASE, identifier)
+	collection, err := db.GetCollection(client, DATABASE, identifier)
 	if err != nil {
 		return err
 	}
@@ -82,3 +82,27 @@ func ImportTableToDb(data [][]string, rowHead []string, colHead []string, identi
 	return nil
 }
 
+// GetLine
+// get line with the identifier from collection
+func ExportLine(collectionURI string, identifier string) (db.Line, error) {
+
+	// step 1 - connect to db
+	client, err := db.Connect(URIdB)
+	if err != nil {
+		return db.Line{}, err
+	}
+
+	// step 2 - get collection
+	collection, err := db.GetCollection(client, DATABASE, collectionURI)
+	if err != nil {
+		return db.Line{}, err
+	}
+
+	// step 3 - get line from db
+	l, err := db.GetSingleLine(collection, identifier)
+	if err != nil {
+		return db.Line{}, err
+	}
+
+	return l, nil
+}

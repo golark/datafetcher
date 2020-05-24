@@ -94,7 +94,7 @@ func exampledb() {
 	database := "testdbt"
 	collectionURI := "testcollection"
 
-	collection, err := db.AddCollection(client, database, collectionURI)
+	collection, err := db.GetCollection(client, database, collectionURI)
 	if err != nil {
 		log.WithFields(log.Fields{"err":err}).Error("")
 	}

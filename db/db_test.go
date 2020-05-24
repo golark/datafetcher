@@ -35,7 +35,7 @@ func TestInsertLine(t *testing.T) {
 	collectionURI := "linecollection"
 	t.Logf("Test 2:\twhen trying to add collection: %v and databse: %v, checking for nil error",database, collectionURI)
 
-	collection, err := db.AddCollection(client, database, collectionURI)
+	collection, err := db.GetCollection(client, database, collectionURI)
 	if err != nil {
 		t.Fatalf("\t%s\tshould not return %v", failed, err)
 	}
@@ -121,7 +121,7 @@ func TestInsertSingleDataPoint(t *testing.T) {
 	collectionURI := "testcollection"
 	t.Logf("Test 2:\twhen trying to add collection: %v and databse: %v, checking for nil error",database, collectionURI)
 
-	collection, err := db.AddCollection(client, database, collectionURI)
+	collection, err := db.GetCollection(client, database, collectionURI)
 	if err != nil {
 		t.Fatalf("\t%s\tshould not return %v", failed, err)
 	}

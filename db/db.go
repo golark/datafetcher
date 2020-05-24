@@ -186,9 +186,9 @@ func Disconnect(client *mongo.Client) error {
 	return nil
 }
 
-// AddCollection
+// GetCollection
 // new database and collection unless exits
-func AddCollection(client *mongo.Client, database string, collection string) (*mongo.Collection, error) {
+func GetCollection(client *mongo.Client, database string, collection string) (*mongo.Collection, error) {
 
 	// step 1 - check client connection
 	if err := IsConnected(client); err != nil {
