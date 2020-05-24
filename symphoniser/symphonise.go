@@ -1,6 +1,7 @@
 package symphoniser
 
 import (
+	"errors"
 	"github.com/golark/datagrabber/db"
 	"github.com/golark/datagrabber/explorer"
 	"github.com/golark/datagrabber/extractor"
@@ -11,8 +12,6 @@ const (
 	URIdB = "mongodb://localhost:27017"
 	DATABASE = "DATAGRABBER"
 )
-
-
 
 func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 
@@ -36,19 +35,27 @@ func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 
 func ImportTableTodB(data [][]string, rowHead []string, colHead []string, identifier string) error {
 
-	// step 1 - connect to db
+	// step 1 - check data size for integrity
+	if len(rowHead) != len(data) {
+		return errors.New("row size / data mismatch")
+	}
+	if len(colHead) != len(data[0]) {
+		return errors.New("column size / data mismatch")
+	}
+
+	// step 2 - connect to db
 	client, err := db.Connect(URIdB)
 	if err != nil {
 		return err
 	}
 
-	// step 2 - add collection
+	// step 3 - add collection
 	collection, err := db.GetCollection(client, DATABASE, identifier)
 	if err != nil {
 		return err
 	}
 
-	// step 3 - import rows
+	// step 4 - import rows
 	for i, r := range rowHead {
 		l := db.Line{Identifier:r,
 			X: colHead,
@@ -61,7 +68,7 @@ func ImportTableTodB(data [][]string, rowHead []string, colHead []string, identi
 		}
 	}
 
-	// step 4 - import columns
+	// step 5 - import columns
 	colData := make([]string, len(data))
 	for i, c := range colHead {
 		for k, d := range data {
@@ -106,3 +113,4 @@ func ExportLine(collectionURI string, identifier string) (db.Line, error) {
 
 	return l, nil
 }
+

@@ -20,7 +20,7 @@ func DownloadLink(URL string) ([][]string, error) {
 	defer resp.Body.Close()
 
 	// step 2 - read it all
-	contents, err := ReadFileContents(resp.Body)
+	contents, err := readContents(resp.Body)
 
 	return contents, nil
 }
