@@ -21,7 +21,7 @@ func TestImportCsvTodB(t *testing.T) {
 
 	// test 1 - read local csv
 	t.Logf("Test 1:\twhen trying to read local csv file, checking for nil error")
-	tableData, err := extractor.ExtractLocalFile("./test.csv")
+	tableData, err := extractor.ExtractTableFromFile("./test.csv")
 	if err != nil {
 		t.Fatalf("\t%s\tshould not return %v", failed, err)
 	}

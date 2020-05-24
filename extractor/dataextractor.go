@@ -16,9 +16,9 @@ type TableData struct {
 	Data       [][]string
 }
 
-// ExtractLocalFile
+// ExtractTableFromFile
 // extract local file contents as TableData
-func ExtractLocalFile(fileName string) (TableData, error) {
+func ExtractTableFromFile(fileName string) (TableData, error) {
 
 	t := TableData{}
 
@@ -43,6 +43,43 @@ func ExtractLocalFile(fileName string) (TableData, error) {
 
 
 	return t, nil
+}
+
+// ExtractTableFromUrl
+// downloads the url and extracts data and headers
+func ExtractTableFromUrl(url string) (TableData, error){
+
+	t := TableData{}
+
+	// step 1 - download
+	raw, err := DownloadLink(url)
+	if err!= nil {
+		log.WithFields(log.Fields{"err":err}).Error("cant download link")
+		return TableData{}, nil
+	}
+
+	// step 2 - extract data and headers
+	if raw != nil {
+		t.Data = extractData(raw)
+		t.RowHeaders, t.ColHeaders = extractHeaders(raw)
+	}
+
+	return t, nil
+}
+
+// GetDataHeadersFromUrl
+// downloads the url and gets data headers
+func GetDataHeadersFromUrl(url string) (rowHeaders, colHeaders []string){
+
+	linkContents, err := DownloadLink(url)
+	if err!= nil {
+		log.WithFields(log.Fields{"err":err}).Error("cant download link")
+		return nil, nil
+	}
+
+	rowHeaders, colHeaders = extractHeaders(linkContents)
+
+	return rowHeaders, colHeaders
 }
 
 // readContents
@@ -94,19 +131,3 @@ func extractData(contents [][]string) [][]string {
 
 	return data
 }
-
-// GetDataHeadersFromUrl
-// downloads the url and gets data headers
-func GetDataHeadersFromUrl(url string) (rowHeaders, colHeaders []string){
-
-	linkContents, err := DownloadLink(url)
-	if err!= nil {
-		log.WithFields(log.Fields{"err":err}).Error("cant download link")
-		return nil, nil
-	}
-
-	rowHeaders, colHeaders = extractHeaders(linkContents)
-
-	return rowHeaders, colHeaders
-}
-
