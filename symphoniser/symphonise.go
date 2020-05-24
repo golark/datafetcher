@@ -1,10 +1,18 @@
 package symphoniser
 
 import (
+	"github.com/golark/datagrabber/db"
 	"github.com/golark/datagrabber/explorer"
 	"github.com/golark/datagrabber/extractor"
 	log "github.com/sirupsen/logrus"
 )
+
+const (
+	URIdB = "mongodb://localhost:27017"
+	DATABASE = "DATAGRABBER"
+)
+
+
 
 func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 
@@ -24,5 +32,53 @@ func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 	log.WithFields(log.Fields{"colHeaders":colHeaders}).Info("")
 
 	return rowHeaders, colHeaders
+}
+
+func ImportTableToDb(data [][]string, rowHead []string, colHead []string, identifier string) error {
+
+	// step 1 - connect to db
+	client, err := db.Connect(URIdB)
+	if err != nil {
+		return err
+	}
+
+	// step 2 - add collection
+	collection, err := db.AddCollection(client, DATABASE, identifier)
+	if err != nil {
+		return err
+	}
+
+	// step 3 - import rows
+	for i, r := range rowHead {
+		l := db.Line{Identifier:r,
+			X: colHead,
+			Y: data[i],
+		}
+
+		err = db.InsertSingleLine(collection, l)
+		if err != nil {
+			return err
+		}
+	}
+
+	// step 4 - import columns
+	colData := make([]string, len(data))
+	for i, c := range colHead {
+		for k, d := range data {
+			colData[k] = d[i]
+		}
+
+		l := db.Line{Identifier:c,
+			X: rowHead,
+			Y: colData,
+		}
+
+		err = db.InsertSingleLine(collection, l)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 

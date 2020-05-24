@@ -91,7 +91,6 @@ func TestInsertLine(t *testing.T) {
 
 }
 
-
 func TestConnectDisconnect(t *testing.T) {
 
 	t.Logf("Test:\twhen trying to connect to db at %v, checking for nil error",URI)
