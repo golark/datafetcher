@@ -20,8 +20,16 @@ func (d DataReq) DataInquiry(req *dgproto.DataReq, stream dgproto.DataService_Da
 
 	log.WithFields(log.Fields{"request identifier":req.Identifier}).Info("received DataInquiry")
 
-	// serve data inquiry
-	// @TODO: complete stub
+	// step 1 - request data
+	points, err := symphoniser.DataInquiry(req.Identifier)
+	if err != nil {
+		return err
+	}
+
+	// step 2 - stream
+	for i := range points {
+		stream.Send(&points[i])
+	}
 
 	return nil
 }

@@ -54,6 +54,33 @@ func GetSingleLine(collection *mongo.Collection, identifier string) (Line, error
 	return l, err
 }
 
+// GetIdentifiers
+// returns all line identifiers in the collection
+func GetIdentifiers(collection *mongo.Collection) ([]string, error) {
+
+	// step 1 - get cursor with all documents
+	emptyFilter := bson.D{{}}
+	c, err := collection.Find(context.TODO(), emptyFilter)
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close(context.TODO())
+
+	// step 2 - iterate through documents and decode
+	var identifiers []string
+	for c.Next(context.TODO()) {
+		var l Line
+
+		if err := c.Decode(&l); err != nil {
+			return nil, err
+		}
+
+		identifiers = append(identifiers, l.Identifier)
+	}
+
+	return identifiers, nil
+}
+
 // DataPoint
 // a single entry of data with row/col headers
 type DataPoint struct {
@@ -213,3 +240,8 @@ func RemoveCollection(client *mongo.Client,  database string, collection string)
 	return err
 }
 
+// GetCollectionNames
+// returns collection names in given database
+func GetCollectionNames(client *mongo.Client, databaseName string) ([]string, error){
+	return client.Database(databaseName).ListCollectionNames(context.TODO(), struct{}{})
+}

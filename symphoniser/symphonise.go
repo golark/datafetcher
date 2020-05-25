@@ -3,6 +3,7 @@ package symphoniser
 import (
 	"errors"
 	"github.com/golark/datagrabber/db"
+	"github.com/golark/datagrabber/dgproto"
 	"github.com/golark/datagrabber/explorer"
 	"github.com/golark/datagrabber/extractor"
 	log "github.com/sirupsen/logrus"
@@ -13,9 +14,26 @@ const (
 	DATABASE = "DATAGRABBER"
 )
 
+// DataInquiry
+// search db for the data and serve directly if data is local
+// search web if data is not local
+func DataInquiry(identifier string) ([]dgproto.PointResp, error) {
+
+	// @todo: step 1 - search db for the requested data
+
+	// @todo: step 2 - serve data if exists on local db
+
+	// @todo: step 3 - search web if data is not local
+
+	return nil, nil
+}
+
+// GetDataHeaders
+// return only data headers that might be related to the data identifier
 func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 
 	// step 1 - find data resource
+	// @todo: make the url search based
 	url:= "https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases"
 
 	// step 2 - find link traces
@@ -33,6 +51,7 @@ func GetDataHeaders(dataIdentifier string) (rowHeaders, colHeaders []string) {
 	return rowHeaders, colHeaders
 }
 
+// ImportTableTodB
 func ImportTableTodB(data [][]string, rowHead []string, colHead []string, identifier string) error {
 
 	// step 1 - check data size for integrity
@@ -89,8 +108,8 @@ func ImportTableTodB(data [][]string, rowHead []string, colHead []string, identi
 	return nil
 }
 
-// GetLine
-// get line with the identifier from collection
+// ExportLine
+// get line with the identifier from given collection URI
 func ExportLine(collectionURI string, identifier string) (db.Line, error) {
 
 	// step 1 - connect to db

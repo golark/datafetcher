@@ -18,6 +18,60 @@ func init() {
 	log.SetLevel(log.PanicLevel) // do not log during testing below panic
 }
 
+func TestGetIdentifiers(t *testing.T) {
+
+	// prep 1 - connect to db
+	client, err := db.Connect(URI)
+	if err != nil {
+		t.Fatalf("\t%s\tshould not return %v", failed, err)
+	}
+	defer db.Disconnect(client)
+
+	// prep 2 - add collection
+	database := "testdb"
+	collectionURI := "testgetidentifiers"
+
+	collection, err := db.GetCollection(client, database, collectionURI)
+	if err != nil {
+		t.Fatalf("\t%s\tshould not return %v", failed, err)
+	}
+
+	// prep 3 - add lines
+	identifiersList := []string{random.String(19), random.String(9), random.String(7), random.String(23)}
+	for _, i := range identifiersList {
+		l := db.Line{Identifier: i,
+			X: []string{"1", "2", "3", "4", "5", "6"},
+			Y: []string{"1", "2", "3", "4", "5", "6"},
+		}
+
+		err = db.InsertSingleLine(collection, l)
+		if err != nil {
+			t.Fatalf("\t%s\tfailed during test preparation %v", failed, err)
+		}
+	}
+
+	// Test 1 - get all of the identifiers
+	t.Logf("Test 1:\twhen trying to get line identifiers in collection %v, checking for nil error and identifier match",collectionURI)
+	identifiers, err := db.GetIdentifiers(collection)
+	if err != nil {
+		t.Fatalf("\t%s\tshould not return %v", failed, err)
+	}
+	t.Logf("\t%s\tshould return nil err", succeed)
+	for i, v := range identifiers {
+		if v != identifiersList[i] {
+			t.Fatalf("\t%s\tidentifier mismatch %v %v", failed, identifiers, identifiersList)
+		}
+	}
+	t.Logf("\t%s\tidentifiers should match", succeed)
+
+	// cleanup
+	err = db.RemoveCollection(client, database, collectionURI)
+	if err != nil {
+		t.Fatalf("\t%s\tshould not return %v", failed, err)
+	}
+
+}
+
 func TestInsertLine(t *testing.T) {
 
 	// test 1 - connect to db
