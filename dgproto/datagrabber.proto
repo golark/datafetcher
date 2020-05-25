@@ -4,15 +4,29 @@ package dgproto;
 
 service DataService {
 
-  rpc DataInquiry(SearchReq) returns (stream DataHeaderResp);
+  rpc HeaderInquiry(HeaderReq) returns (stream HeaderResp);
+
+  rpc DataInquiry(DataReq) returns (stream PointResp);
 
 }
 
-message SearchReq {
+message HeaderReq {
   string Identifier = 1;
 }
 
-message DataHeaderResp {
+message HeaderResp {
   string ColHeader = 1;
   string RowHeader = 2;
+}
+
+message DataReq {
+  string Identifier = 1;
+}
+
+message PointResp {
+  string X      = 1;
+  int32  Y      = 2;
+  string Title  = 3;
+  string XLabel = 4;
+  string YLabel = 5;
 }
