@@ -30,7 +30,7 @@ func ExtractTableFromFile(fileName string) (TableData, error) {
 	defer fl.Close()
 
 	// step 2 - read contents
-	raw, err := readContents(fl)
+	raw, err := readCsvContents(fl)
 	if err != nil {
 		return TableData{}, err
 	}
@@ -40,7 +40,6 @@ func ExtractTableFromFile(fileName string) (TableData, error) {
 	t.RowHeaders, t.ColHeaders = extractHeaders(raw)
 
 	log.WithFields(log.Fields{"cols:":len(t.ColHeaders),  "data:": strconv.Itoa(len(t.Data)) + "x" + strconv.Itoa(len(t.Data[0])),"rows:":len(t.RowHeaders) }).Info("extracted")
-
 
 	return t, nil
 }
@@ -82,11 +81,12 @@ func GetDataHeadersFromUrl(url string) (rowHeaders, colHeaders []string){
 	return rowHeaders, colHeaders
 }
 
-// readContents
+// readCsvContents
 // read file contents
-func readContents(r io.ReadCloser) ([][]string, error ){
+func readCsvContents(r io.ReadCloser) ([][]string, error ){
 
 	reader := csv.NewReader(r)
+
 	contents, err := reader.ReadAll()
 	if err!=nil {
 		log.WithFields(log.Fields{"err":err}).Error("cant read reader contents")
@@ -131,3 +131,4 @@ func extractData(contents [][]string) [][]string {
 
 	return data
 }
+

@@ -2,6 +2,7 @@ package extractor_test
 
 import (
 	"github.com/golark/datagrabber/extractor"
+	log "github.com/sirupsen/logrus"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ const (
 )
 
 func init() {
-	//log.SetLevel(log.PanicLevel) // do not log during testing below panic
+	log.SetLevel(log.PanicLevel) // do not log during testing below panic
 }
 
 func TestDownloadLink(t *testing.T) {
@@ -28,11 +29,25 @@ func TestDownloadLink(t *testing.T) {
 
 }
 
+func TestDownloadCsvFile(t *testing.T) {
+
+	// test 1 - url for extraction
+	fileUrl := "https://docs.google.com/spreadsheets/d/1d2lERa6yTox04q5klG0-hOskRfWcswQnF6rZRjq_LAQ/gviz/tq?tqx=out:csv"
+	filePath := "/tmp/tmp.csv"
+	t.Logf("Test 1:\twhen trying to download file from url %v, checking for nil error", fileUrl)
+
+	_, err := extractor.DownloadCsvFile(fileUrl, filePath, 5000)
+	if err != nil {
+		t.Fatalf("\t%s\tshould not return %v", failed, err)
+	}
+	t.Logf("\t%s\tshould return nil err", succeed)
+}
+
 func TestExtractTableFromUrl(t *testing.T) {
 
 
 	// test 1 - url for extraction
-	testUrl := "https://drive.google.com/open?id=1KHNY9xA230doAgD-5h3TMRo0P-SlptiA"
+	testUrl := "https://docs.google.com/spreadsheets/d/1d2lERa6yTox04q5klG0-hOskRfWcswQnF6rZRjq_LAQ/gviz/tq?tqx=out:csv"
 	t.Logf("Test 1:\twhen trying to extract table from url %v, checking for nil error", testUrl)
 
 	tableWeb, err := extractor.ExtractTableFromUrl(testUrl)

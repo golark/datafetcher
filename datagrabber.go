@@ -27,7 +27,7 @@ func exampleSingleShotGrpcClient(addr string) error {
 
 	client := dgproto.NewDataServiceClient(conn)
 
-	r, err := client.DataInquiry(context.Background(), &dgproto.SearchReq{Identifier:""})
+	r, err := client.DataInquiry(context.Background(), &dgproto.DataReq{Identifier:""})
 	if err != nil {
 		log.WithFields(log.Fields{"err":err}).Error("cant get data inquiry client")
 		return err
