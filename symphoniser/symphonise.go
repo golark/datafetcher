@@ -3,10 +3,13 @@ package symphoniser
 import (
 	"errors"
 	"github.com/golark/datagrabber/db"
+	"github.com/golark/datagrabber/detective"
 	"github.com/golark/datagrabber/dgproto"
 	"github.com/golark/datagrabber/explorer"
 	"github.com/golark/datagrabber/extractor"
 	log "github.com/sirupsen/logrus"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -19,11 +22,41 @@ const (
 // search web if data is not local
 func DataInquiry(identifier string) ([]dgproto.PointResp, error) {
 
-	// @todo: step 1 - search db for the requested data
+	// step 1 - distinguish data and collection identifier
+	identifiers := strings.Split(identifier, " ")
+	if len(identifiers) < 2 { // identifiers must be at least 2 words
+		return nil, errors.New("data identifier is less than 2 words")
+	}
+	collectionIdentifier := strings.ToLower(identifiers[0])
+	dataIdentifier := strings.ToLower(identifiers[1])
 
-	// @todo: step 2 - serve data if exists on local db
+	// step 2 - search db for the requested data
+	l, err := detective.SearchDatabase(URIdB, DATABASE, collectionIdentifier, dataIdentifier)
+	if err != nil {
+		return nil, err
+	}
+	if l.Identifier == "" { // no results returned from database
+		// @todo: step 3 - search web if data is not local
+		return nil, nil
+	}
 
-	// @todo: step 3 - search web if data is not local
+	// step 3 - serve data if exists on local db
+	points := make([]dgproto.PointResp, len(l.X))
+
+	for i:=0;i<len(points);i++ {
+		points[i].X = l.X[i]
+
+		y, err := strconv.Atoi(l.Y[i])
+		if err != nil {
+			return nil, errors.New("cant convert y entry to integer")
+		}
+		points[i].Y = int32(y)
+
+		points[i].Title = l.Identifier
+		points[i].XLabel = "" // @todo: populate XLabel
+		points[i].YLabel = l.Identifier
+
+	}
 
 	return nil, nil
 }

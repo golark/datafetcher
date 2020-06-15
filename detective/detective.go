@@ -14,7 +14,7 @@ var (
 // SearchDatabase
 // first try to find the collection in db
 // if collection exists try to find the data
-func SearchDatabase(URIdB string, databaseName string, searchCollection string, searchData string) (db.Line, error) {
+func SearchDatabase(URIdB string, databaseName string, collectionIdentifier string, dataIdentifier string) (db.Line, error) {
 
 	// step 1 - get collection names from db
 	client, err := db.Connect(URIdB)
@@ -30,7 +30,7 @@ func SearchDatabase(URIdB string, databaseName string, searchCollection string, 
 	// looking for bit-exact match
 	collectionFound := false
 	for _, s := range collectionNames {
-		if searchCollection == s {
+		if collectionIdentifier == s {
 			collectionFound = true
 		}
 	}
@@ -40,7 +40,7 @@ func SearchDatabase(URIdB string, databaseName string, searchCollection string, 
 
 	// step 3 - search inside collection for data
 	// get document identifiers
-	collection, err := db.GetCollection(client, databaseName, searchCollection)
+	collection, err := db.GetCollection(client, databaseName, collectionIdentifier)
 	if err != nil {
 		return db.Line{}, err
 	}
@@ -52,7 +52,7 @@ func SearchDatabase(URIdB string, databaseName string, searchCollection string, 
 	}
 	identifierFound := false
 	for _, i := range identifiers {
-		if i == searchData {
+		if i == dataIdentifier {
 			identifierFound = true
 			break
 		}
@@ -62,7 +62,7 @@ func SearchDatabase(URIdB string, databaseName string, searchCollection string, 
 	}
 
 	// step 4 - get the line corresponding to the detected identifier in detected collection
-	l, err := db.GetSingleLine(collection, searchData)
+	l, err := db.GetSingleLine(collection, dataIdentifier)
 
 	return l, nil
 }

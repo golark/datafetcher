@@ -228,3 +228,26 @@ func TestInsertSingleDataPoint(t *testing.T) {
 	t.Logf("\t%s\tshould return nil err", succeed)
 
 }
+
+func exampledb() {
+
+	URI := "mongodb://localhost:27017"
+	client, err := db.Connect(URI)
+	if err != nil {
+		log.WithFields(log.Fields{"err":err}).Error("")
+	}
+	defer db.Disconnect(client)
+
+
+	database := "testdbt"
+	collectionURI := "testcollection"
+
+	collection, err := db.GetCollection(client, database, collectionURI)
+	if err != nil {
+		log.WithFields(log.Fields{"err":err}).Error("")
+	}
+
+	db.InsertSingleDataPoint(collection, db.DataPoint{Col:"col", Row:"row", Val:"val"})
+	if err != nil {
+	}
+}
