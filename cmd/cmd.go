@@ -5,6 +5,8 @@ import (
 	"github.com/golark/datagrabber/symphoniser"
 	log "github.com/sirupsen/logrus"
 	gRPC "google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"net"
 )
 
@@ -23,10 +25,12 @@ func (d DataReq) DataInquiry(req *dgproto.DataReq, stream dgproto.DataService_Da
 	// step 1 - request data
 	points, err := symphoniser.DataInquiry(req.Identifier)
 	if err != nil {
-		return err
+		log.WithFields(log.Fields{"err":err}).Error("DataInquiry error")
+		return status.Error(codes.NotFound, "data not found")
 	}
 
 	// step 2 - stream
+	log.Info("starting the stream")
 	for i := range points {
 		stream.Send(&points[i])
 	}

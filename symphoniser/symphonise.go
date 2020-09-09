@@ -39,6 +39,7 @@ func DataInquiry(identifier string) ([]dgproto.PointResp, error) {
 		// @todo: step 3 - search web if data is not local
 		return nil, nil
 	}
+	log.WithFields(log.Fields{"identifier":l.Identifier}).Info("detected identifier in dB")
 
 	// step 3 - serve data if exists on local db
 	points := make([]dgproto.PointResp, len(l.X))
